@@ -174,6 +174,29 @@ public class BlazeXmlSchemaTest {
     assertThat(BlazeXmlSchema.getErrorContent(testCase.errors.get(0))).isNull();
   }
 
+  @Test
+  public void testErrorWithoutMessage() {
+    TestSuite parsed =
+        parseXml(
+            "<?xml version='1.0' encoding='UTF-8'?>",
+            "<testsuites>",
+            "  <testsuite name='com.google.ConfigTest' tests='1' failures='0' errors='1'>",
+            "    <testcase name='testCase1' status='run' duration='55' time='55'>",
+            " <error type='java.lang.NullPointerException'><![CDATA[java.lang.NullPointerException",
+            "  at com.example.MyClass.myMethod(MyClass.java:55)",
+            "]]></error>",
+            "    </testcase>",
+            "  </testsuite>",
+            "</testsuites>");
+
+    ErrorOrFailureOrSkipped error = parsed.testSuites.get(0).testCases.get(0).errors.get(0);
+
+    assertThat(error.type).isEqualTo("java.lang.NullPointerException");
+    assertThat(BlazeXmlSchema.getErrorContent(error))
+        .isEqualTo("java.lang.NullPointerException\n  at com.example.MyClass.myMethod(MyClass.java:55)");
+    assertThat(error.message).isNull();
+  }
+
   private static TestSuite parseXml(String... lines) {
     InputStream stream =
         new ByteArrayInputStream(Joiner.on('\n').join(lines).getBytes(StandardCharsets.UTF_8));

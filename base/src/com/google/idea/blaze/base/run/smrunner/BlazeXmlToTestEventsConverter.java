@@ -383,7 +383,7 @@ public class BlazeXmlToTestEventsConverter extends OutputToGeneralTestEventsConv
       String name, ErrorOrFailureOrSkipped error, long duration) {
     String message =
         error.message != null ? error.message : "Test failed (no error message present)";
-    String content = pruneErrorMessage(error.message, BlazeXmlSchema.getErrorContent(error));
+    String content = pruneErrorMessage(message, BlazeXmlSchema.getErrorContent(error));
     return getTestFailedEvent(name, message, content, parseComparisonData(error), duration);
   }
 
